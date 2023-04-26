@@ -1,0 +1,232 @@
+#!/packages/envs/scicomp/bin/python
+"""
+Provides a summary table of the cluster's node status.
+
+Originally written by Prof. Jay Oswald <joswald1@asu.edu>, obtained from 
+#rc-support slack channel by Jason Yalim <jyalim@asu.edu> 2023-04-05.
+"""
+
+# TODO: make colsize in summary_screen dynamic based on widest nodename
+# (and number of GPUs unless --no-gpus passed)
+
+import subprocess
+import re
+import os
+import sys
+
+gpu_status_symbol = dict(idle='○',alloc='●')
+
+ESC    = '\033['
+END    = 'm'
+BOLD   = '1'
+COLORS = dict(
+    black='30',
+      red='31',
+    green='32',
+   yellow='33',
+     blue='34',
+  magenta='35',
+     cyan='36',
+    white='37',
+     gray='38',
+)
+LIGHT_COLORS = {k:str(int(v)+60) for k,v in COLORS.items()}
+RESET = f'{ESC}0{END}'
+
+def main(nodelist=None,no_gpus=False):
+  nodes = node_status(nodelist=nodelist,no_gpus=no_gpus)
+  #print_avail_cores_on_nodes(nodes)
+  summary_screen(nodes,no_gpus=no_gpus)
+
+def print_avail_cores_on_nodes(nodes):
+  nodes.sort(key=lambda n: n.cores_free())
+  for n in nodes:
+    print(f'{n.name:8s} {n.cores_free():>3d} {n.state:>10s}')
+
+def summary_screen(nodes, colsize=7, no_gpus=False):
+  ''' Prints a color-coded summary of the free cores on each node. '''
+  cols = os.get_terminal_size().columns // (colsize+2)
+  s = '-'*(cols*(colsize+1)+1) + '\n'
+  dc = RESET
+  for row in divide_chunks(nodes, cols):
+    for n in row:
+      c = n.color()
+      s += f'|{c}{center(n.name, colsize)}{dc}'
+    s += '|\n'
+    for n in row:
+      c = n.color()
+      f = f'{n.cores_free()}/{n.cores}'
+      s += f'|{c}{center(f, colsize)}{dc}'
+    s += '|\n'
+    if no_gpus == False:
+      for n in row:
+        c = n.color()
+        f = f'{n.gpus_allocated_str}' if n.gpu_type else ''
+        s += f'|{c}{center(f, colsize)}{dc}'
+      s += '|\n'
+    s += '-'*(cols*(colsize+1)+1) + '\n'
+  print(s)
+
+def node_status(nodelist=None,no_gpus=False):
+  ''' Gets the number of allocated cores on each node. '''
+  cmd = 'scontrol show nodes --details'.split()
+  if nodelist is not None:
+    cmd.append(nodelist)
+  out = subprocess.run(cmd, capture_output=1, text=1)
+  node_iter = iter(out.stdout.split('\n'))
+  nodes = []
+  while True:
+    n = parse_next_node(node_iter,no_gpus=no_gpus)
+    if n is None:
+      break
+    nodes.append(n)
+  return nodes
+
+class node:
+  def __init__(self, name):
+    self.name = name
+    self.state        = None
+    self.in_bad_state = True
+    self.is_allocated = False
+
+    self.cores           = 0
+    self.cores_allocated = 0
+
+    self.gpus                = 0
+    self.gpu_type            = None      
+    self.gpus_allocated      = 0
+    self.gpus_allocated_IDX  = None
+    self.gpus_allocated_str  = ''
+
+  def cores_free(self):
+    return self.cores - self.cores_allocated
+
+  def gpus_free(self):
+    return self.gpus - self.gpus_allocated
+
+  def set_gpu_alloc_str(self):
+    gpu_str   = list(self.gpus*gpu_status_symbol['idle'])
+    for ell in self.gpus_allocated_IDX.split(','):
+      if '-' in ell:
+        m,n = ell.split('-')
+        for k in range(int(m),int(n)+1):
+          gpu_str[k] = gpu_status_symbol['alloc']
+      elif 'N/A' in ell:
+        pass
+      else:
+        gpu_str[int(ell)] = gpu_status_symbol['alloc']
+    self.gpus_allocated_str = ''.join(gpu_str)
+    return None
+
+  def color(self):
+    ''' 
+    Returns a shell color code corresponding to the amount of available
+    cores. 
+    '''
+    cstr = lambda c: f'{ESC}{c};{BOLD}{END}'
+    if self.in_bad_state:
+      return cstr(COLORS['gray'])
+    elif self.is_allocated:
+      return cstr(COLORS['red'])
+    cf = self.cores_free()
+    if cf == self.cores:
+      return cstr(COLORS['green'])
+    if cf > self.cores * 0.75:
+      return cstr(COLORS['cyan'])
+    if cf > self.cores * 0.5:
+      return cstr(LIGHT_COLORS['blue'])
+    if cf > self.cores * 0.25:
+      return cstr(COLORS['magenta'])
+    if cf >= 1:
+      return cstr(COLORS['yellow'])
+    return cstr(COLORS['red'])
+
+def parse_next_node(node_iter,no_gpus=False):
+  for line in node_iter:
+    if line.startswith('NodeName='):
+      break
+  else:
+    return None
+  try:
+    n = node(re.search('NodeName=(.*.) ', line).group(1).split()[0])
+  except Exception as ex:
+    print("Error occurred while parsing nodenames",file=sys.stderr)
+    return None
+  m3= None
+  m4= None
+  for line in node_iter:
+    m1 = re.search('State=(.*.) Threads', line)
+    m2 = re.search('CPUAlloc=(\d+) CPUEfctv=\d+ CPUTot=(\d+)', line)
+    if no_gpus == False:
+      m3 = re.search('Gres=gpu:(.*.):(\d+)', line)
+      m4 = re.search('GresUsed=gpu:(.*.):(\d+)\(IDX:(.*.)\)', line)
+    if not line:
+      break
+    elif m1:
+      n.state        = m1.group(1).lower()
+
+      is_allocated   = re.search('allocated',n.state)
+      n.is_allocated = True if is_allocated else False
+
+      bad_state      = re.search('drain|down|maint|not_available',n.state)
+      n.in_bad_state = True if bad_state    else False
+    elif m2:
+      n.cores           = int(m2.group(2))
+      n.cores_allocated = int(m2.group(1))
+    elif m3:
+      n.gpu_type = m3.group(1)
+      n.gpus     = int(m3.group(2))
+    elif m4:
+      n.gpus_allocated     = int(m4.group(2))
+      n.gpus_allocated_IDX = m4.group(3)
+    else:
+      pass
+  if n.gpus_allocated_IDX is not None:
+    n.set_gpu_alloc_str()
+  return n
+
+def center(s, n):
+  ''' Centers s in a text block of length n (padded with spaces)'''
+  s = str(s)
+  m = n - len(s)
+  return (m//2 + m%2)*' ' + s + (m//2)*' '
+
+def divide_chunks(x, n):
+  ''' Splits list of x into chunks of n. '''
+  for i in range(0, len(x), n):
+    yield x[i:i + n]
+
+if __name__ == '__main__':
+  import argparse
+  parser = argparse.ArgumentParser(
+    description="Print the system node status (ns).",
+    epilog=f"""
+      output format:
+           node name, 
+           idle/total cores, 
+           idle ({gpu_status_symbol['idle']}) or 
+           allocated ({gpu_status_symbol['alloc']}) gpus
+    """, # note newlines are ignored
+  )
+  parser.add_argument(
+    "--nodelist",
+    "--node-list", # get common mistypes
+    "--node_list",
+    "-n",
+    "-N",
+    type=str,
+    default=None,
+    help="Optional argument to limit report to specific list of nodes"
+  )
+  parser.add_argument(
+    "--no-gpus",
+    "--nogpus",
+    "--only-cpus",
+    "--only-cores",
+    "--compact",
+    "-c",
+    action="store_true", # boolean flag
+    help="Optional argument, prevents GPU status in output"
+  )
+  args = parser.parse_args()
+  main(nodelist=args.nodelist,no_gpus=args.no_gpus)

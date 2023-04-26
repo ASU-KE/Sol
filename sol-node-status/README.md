@@ -1,10 +1,31 @@
 Sol Node Status
 ===============
 
+Command-line
+------------
+
 <div float="center">
  <p align="center"> 
   <img 
     height=600 
+    style="aspect-ratio:2798/1996"
+    src="assets/ns.png" 
+    alt="Command-line utility, ns, for displaying node status" 
+  >
+ </p>
+</div>
+
+Python script created by Prof. Jay Oswald that converts SLURM node
+states into a convenient table summary in arbitrary-width terminals.
+
+Open OnDemand
+-------------
+
+<div float="center">
+ <p align="center"> 
+  <img 
+    height=600 
+    style="aspect-ratio:238/217"
     src="assets/anim.gif" 
     alt="Animation over April 4, 2023 of the Sol cluster's node utilization." 
   >
