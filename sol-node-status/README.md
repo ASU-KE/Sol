@@ -7,8 +7,7 @@ Command-line
 <div float="center">
  <p align="center"> 
   <img 
-    height=600 
-    style="aspect-ratio:2798/1996"
+    width="95%" 
     src="assets/ns.png" 
     alt="Command-line utility, ns, for displaying node status" 
   >
@@ -24,8 +23,7 @@ Open OnDemand
 <div float="center">
  <p align="center"> 
   <img 
-    height=600 
-    style="aspect-ratio:238/217"
+    width="95%" 
     src="assets/anim.gif" 
     alt="Animation over April 4, 2023 of the Sol cluster's node utilization." 
   >
