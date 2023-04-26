@@ -14,7 +14,7 @@ The following repository contains supplementary material for a PEARC
 
 <div float="center">
   <img 
-    height=300 
+    height=200 
     src="https://github.com/ASU-KE/rc-assets/raw/main/logos/ASURC_custom_gradient_banner.jpg" 
     alt="ASU Research Computing gradient banner logo" 
   >
