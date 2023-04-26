@@ -2,11 +2,13 @@ Sol Node Status
 ===============
 
 <div float="center">
+ <p align="center"> 
   <img 
     height=600 
     src="assets/anim.gif" 
     alt="Animation over April 4, 2023 of the Sol cluster's node utilization." 
   >
+ </p>
 </div>
 
 Scrapes SLURM via `sinfo` and plots node status with `plotly`.
