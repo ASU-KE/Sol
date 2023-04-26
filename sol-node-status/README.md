@@ -18,7 +18,7 @@ and python scripts via `crontab`:
 
 Live on Open OnDemand page ([Sol status][sol-status]).
 
-Shell script will only save every tenth `zstd -19` compressed comma-seperated
+Shell script will only save every tenth `zstd -19` compressed comma-separated
 value (csv) files (every ten minutes). This is determined by an incremented
 counter that is stored in `snapshot/.snapshot_modulo.do.not.delete`. When there
 are errors, the `zstd` file will not be generated and `csv`s will not be
