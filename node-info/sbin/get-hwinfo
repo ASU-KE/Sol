@@ -1,0 +1,20 @@
+#!/bin/bash
+readonly wd="/packages/public/sol-hwinfo"
+readonly p="/packages/apps/gnu-parallel/20221022/bin/parallel"
+
+readonly po=(
+  --will-cite
+# --dry-run
+  -kj2
+)
+
+readonly so=(
+  -o ConnectTimeout=5
+)
+
+$p "${po[@]}" "ssh ${so[@]} {} 'lshw    > ${wd}/{}-lshw'"   :::: nodes
+$p "${po[@]}" "ssh ${so[@]} {} 'free -b > ${wd}/{}-free'"   :::: nodes
+$p "${po[@]}" "ssh ${so[@]} {} 'ibstat  > ${wd}/{}-ibstat'" :::: nodes
+
+$p "${po[@]}" "ssh ${so[@]} {} 'nvidia-smi topo -m  > ${wd}/{}-nvidia-smi-topo'" :::: < <(/usr/bin/grep -E '^c?g' nodes)
+$p "${po[@]}" "ssh ${so[@]} {} 'nvidia-smi -L       > ${wd}/{}-nvidia-smi'"      :::: < <(/usr/bin/grep -E '^c?g' nodes)

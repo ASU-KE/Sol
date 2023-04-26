@@ -1,0 +1,17 @@
+CA 'mlx5_0'
+	CA type: MT4123
+	Number of ports: 1
+	Firmware version: 20.34.1002
+	Hardware version: 0
+	Node GUID: 0xb83fd203009710b8
+	System image GUID: 0xb83fd203009710b8
+	Port 1:
+		State: Active
+		Physical state: LinkUp
+		Rate: 200
+		Base lid: 212
+		LMC: 0
+		SM lid: 9
+		Capability mask: 0xa651e848
+		Port GUID: 0xb83fd203009710b8
+		Link layer: InfiniBand

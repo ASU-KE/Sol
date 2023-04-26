@@ -1,0 +1,41 @@
+/
+├── data   # Project-based storage mount
+├── home   # User home directory mount
+├── opt
+│   ├── beegfs
+│   ├── consul
+│   ├── mellanox
+│   ├── nvidia
+│   ├── prometheus
+│   ├── TurboVNC    # OOD Virtual Desktop
+│   └── VirtualGL   # OOD Virtual Desktop
+├── packages        # system-wide deliverable mount
+│   ├── apps        # applications maintained by admins 
+│   ├── envs        # global python base mamba environments
+│   ├── modulefiles # 
+│   └── public      # for templates and node-status tracking
+├── scratch         # BeeGFS mount
+├── sysadmin        # system-wide root-only directory
+│   ├── arbiter2
+│   ├── benchmarking
+│   ├── build
+│   ├── cobbler
+│   ├── fpga
+│   ├── mariadb
+│   ├── networking
+│   ├── Open-OnDemand
+│   ├── prometheus
+│   ├── purgatory
+│   ├── repos
+│   ├── scripts
+│   ├── singularity
+│   ├── skel
+│   ├── slurm-ha
+│   ├── software
+│   ├── tmp
+│   ├── vmd
+│   ├── xdmod
+│   └── yum
+└── usr
+    └── local
+        └── bin    # user-facing scripts
