@@ -1,0 +1,3 @@
+[submodule "sol-node-status/sol-status-page"]
+	path = sol-node-status/sol-status-page
+	url = https://github.com/jyalim/sol-status-page

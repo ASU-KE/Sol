@@ -1,6 +1,6 @@
 #!/packages/envs/scicomp/bin/python
 """
-VERSION: 0.7
+VERSION: 0.8
 BLAME: Jason <yalim@asu.edu>
 """
 import plotly
@@ -41,6 +41,35 @@ gpu_status_symbol = dict(idle='○',alloc='●')
 BASE_WIDTH= 68 # HORZ PIXELS PER NODE 
 BASE_DEPTH= 62 # VERT PIXELS PER NODE 
 FONTSIZE  = 12
+
+def mig_disk(center=np.r_[0,0], radius=1, alloc_mig=[], max_mig=7, n=720):
+  # Draw main GPU circle
+  OX,OY = center
+  th = np.linspace(0,1,n+1,dtype=np.float64)[:-1]*2*np.pi
+  x  = center + radius*np.c_[np.cos(th),np.sin(th)]
+  pdisk = f"M {x[0,0]:6.3e},{x[0,1]:6.3e}" 
+  for xc in x[1:]:
+    pdisk += f" L{xc[0]:6.3e},{xc[1]:6.3e}"
+  pdisk += f" L{x[0,0]:6.3e},{x[0,1]:6.3e} Z"
+  psegs = []
+  # Draw MIG segments
+  if len(alloc_mig) > 0:
+    ori   = f'L{OX:6.3e},{OY:6.3e}'
+    rads0 = np.array(alloc_mig)/max_mig * 2 * np.pi
+    radsN = rads0 + 2*np.pi/max_mig
+    X0    = center+radius*np.c_[np.cos(rads0),np.sin(rads0)]
+    XN    = center+radius*np.c_[np.cos(radsN),np.sin(radsN)]
+    for k in range(len(X0)):
+      x0,y0 = X0[k]
+      xN,yN = XN[k]
+      th    = np.linspace(rads0[k],radsN[k],11)[1:-1][::-1]
+      xx    = center + radius*np.c_[np.cos(th),np.sin(th)]
+      pseg  = f'M {x0:6.3e},{y0:6.3e} {ori} L{xN:6.3e},{yN:6.3e}'
+      for x_ in xx:
+        pseg += f' L{x_[0]:6.3e},{x_[1]:6.3e}'
+      pseg += f' L{x0:6.3e},{y0:6.3e} Z'
+      psegs.append(pseg)
+  return pdisk,psegs
 
 def get_gpu_str(rdf):
   gpu_str = ''
@@ -91,75 +120,89 @@ AGG_DICT['PARTITION'] = ','.join
 AGG_DICT.pop('NODELIST',None)
 
 STATE_COLOR_MAP = {
-  'idle'       : '#00ff00',
-  'idle*'      : '#00ff00',
-  'idle-'      : '#00ff00',
-  'idle+'      : '#00ff00',
-  'idle$'      : '#00ff00',
-  'mixed'      : '#ff8800',
-  'mixed+'     : '#ff8800',
-  'mixed*'     : '#ff8800',
-  'mixed$'     : '#ff8800',
-  'mixed-'     : '#ff8800',
-  'allocated'  : '#ff0000',
-  'allocated$' : '#ff0000',
-  'allocated*' : '#ff0000',
-  'allocated-' : '#ff0000',
-  'allocated+' : '#ff0000',
-  'completing' : '#ffff00',
-  'down'       : '#777777',
-  'down$'      : '#777777',
-  'down*'      : '#777777',
-  'down-'      : '#777777',
-  'drained'    : '#00aacc',
-  'drained$'   : '#00aacc',
-  'drained*'   : '#00aacc',
-  'drained-'   : '#00aacc',
-  'drained+'   : '#00aacc',
-  'draining'   : '#00ddff',
-  'draining$'  : '#00ddff',
-  'inval'      : '#999900',
-  'maint'      : '#ff5f15',
-  'maint*'     : '#ff5f15',
-  'planned'    : '#ffb300',
-  'unknown*'   : '#999999',
-  'reboot^'    : '#ffffff',
+  'idle'        : '#00ff00',
+  'idle*'       : '#00ff00',
+  'idle-'       : '#00ff00',
+  'idle+'       : '#00ff00',
+  'idle$'       : '#00ff00',
+  'mixed'       : '#ff8800',
+  'mixed+'      : '#ff8800',
+  'mixed*'      : '#ff8800',
+  'mixed$'      : '#ff8800',
+  'mixed-'      : '#ff8800',
+  'allocated'   : '#ff0000',
+  'allocated$'  : '#ff0000',
+  'allocated*'  : '#ff0000',
+  'allocated-'  : '#ff0000',
+  'allocated+'  : '#ff0000',
+  'completing'  : '#ffff00',
+  'completing*' : '#ffff00',
+  'down'        : '#777777',
+  'down$'       : '#777777',
+  'down*'       : '#777777',
+  'down-'       : '#777777',
+  'drained'     : '#00aacc',
+  'drained$'    : '#00aacc',
+  'drained*'    : '#00aacc',
+  'drained-'    : '#00aacc',
+  'drained+'    : '#00aacc',
+  'draining'    : '#00ddff',
+  'draining$'   : '#00ddff',
+  'draining*'   : '#00ddff',
+  'inval'       : '#999900',
+  'maint'       : '#ff5f15',
+  'maint*'      : '#ff5f15',
+  'planned'     : '#ffb300',
+  'unknown*'    : '#999999',
+  'reboot^'     : '#ffffff',
+  'reserved'    : '#990000',
+  'reserved$'   : '#990000',
+  'reserved*'   : '#990000',
+  'reserved-'   : '#990000',
+  'reserved+'   : '#990000',
 }
 
 STATE_TEXTFONT_COLOR_MAP = {
-  'idle'       : '#000000',
-  'idle*'      : '#000000',
-  'idle-'      : '#000000',
-  'idle+'      : '#000000',
-  'idle$'      : '#000000',
-  'mixed'      : '#000000',
-  'mixed$'     : '#000000',
-  'mixed*'     : '#000000',
-  'mixed+'     : '#000000',
-  'mixed-'     : '#000000',
-  'allocated'  : '#ffffff',
-  'allocated$' : '#ffffff',
-  'allocated*' : '#ffffff',
-  'allocated-' : '#ffffff',
-  'allocated+' : '#ffffff',
-  'completing' : '#000000',
-  'down'       : '#ffffff',
-  'down*'      : '#ffffff',
-  'down$'      : '#ffffff',
-  'down-'      : '#ffffff',
-  'drained'    : '#000000',
-  'drained$'   : '#000000',
-  'drained*'   : '#000000',
-  'drained-'   : '#000000',
-  'drained+'   : '#000000',
-  'draining'   : '#000000',
-  'draining$'  : '#000000',
-  'inval'      : '#ff0000',
-  'maint'      : '#000000',
-  'maint*'     : '#000000',
-  'planned'    : '#000000',
-  'unknown*'   : '#ffff00',
-  'reboot^'    : '#000000',
+  'idle'        : '#000000',
+  'idle*'       : '#000000',
+  'idle-'       : '#000000',
+  'idle+'       : '#000000',
+  'idle$'       : '#000000',
+  'mixed'       : '#000000',
+  'mixed$'      : '#000000',
+  'mixed*'      : '#000000',
+  'mixed+'      : '#000000',
+  'mixed-'      : '#000000',
+  'allocated'   : '#ffffff',
+  'allocated$'  : '#ffffff',
+  'allocated*'  : '#ffffff',
+  'allocated-'  : '#ffffff',
+  'allocated+'  : '#ffffff',
+  'completing'  : '#000000',
+  'completing*' : '#000000',
+  'down'        : '#ffffff',
+  'down*'       : '#ffffff',
+  'down$'       : '#ffffff',
+  'down-'       : '#ffffff',
+  'drained'     : '#000000',
+  'drained$'    : '#000000',
+  'drained*'    : '#000000',
+  'drained-'    : '#000000',
+  'drained+'    : '#000000',
+  'draining'    : '#000000',
+  'draining$'   : '#000000',
+  'draining*'   : '#000000',
+  'inval'       : '#ff0000',
+  'maint'       : '#000000',
+  'maint*'      : '#000000',
+  'planned'     : '#000000',
+  'unknown*'    : '#ffff00',
+  'reboot^'     : '#000000',
+  'reserved'    : '#ffffff',
+  'reserved$'   : '#ffffff',
+  'reserved*'   : '#ffffff',
+  'reserved-'   : '#ffffff',
+  'reserved+'   : '#ffffff',
 }
 
 SCATTER_OPTS = dict(
@@ -234,17 +277,35 @@ fig.layout.height = BASE_DEPTH * M # /11) if N > 11 else BASE_DEPTH
 print('len M N w h')
 print(len(df), M, N, fig.layout.width, fig.layout.height)
 fig.update_traces(**TRACE_OPTS)
+pshapes = []
 for i,r in gdf.iterrows():
   c = STATE_TEXTFONT_COLOR_MAP[r.STATE]
-  fig.add_annotation(
-    x=r.x-0.45,
-    y=r.y-0.16,
-    text=r.gpu_str,
-    showarrow=False,
-    xanchor='left',
-    yanchor='top',
-    font=dict(size=FONTSIZE,color=c),
-  )
+  # TODO: make more flexible -- this is hard coded for 4 A100s split
+  # into 7 MIG slices each (28 total MIG instances).
+  if len(r.gpu_str) == 28:
+    gpus_alloc = [[],[],[],[]]
+    for k,status in enumerate(r.gpu_str):
+      if status == gpu_status_symbol['alloc']:
+        gpu_num = k//7
+        gpu_ind = k%7
+        gpus_alloc[gpu_num].append(gpu_ind)
+    for k in range(4):
+      pdisk,psegs = mig_disk(center=np.r_[r.x-0.32+k*0.21,r.y-0.32], radius=0.095, alloc_mig=gpus_alloc[k], max_mig=7, n=101)
+      pshapes.append(dict(type="path",path=pdisk,line_color=c,line=dict(width=1.2)))
+      for pseg in psegs:
+        pshapes.append(
+          dict(type="path",path=pseg,fillcolor=c,line_color=c,line=dict(width=0))
+        )
+  else:
+    fig.add_annotation(
+      x=r.x-0.45,
+      y=r.y-0.16,
+      text=r.gpu_str,
+      showarrow=False,
+      xanchor='left',
+      yanchor='top',
+      font=dict(size=FONTSIZE,color=c),
+    )
 fig.update_layout(
   autosize=True,
 # width=500,
@@ -259,7 +320,8 @@ fig.update_layout(
 # paper_bgcolor="white",
   xaxis_range= [-0.5,df['x'].values.max()+0.5],
   yaxis_range= [-0.5,df['y'].values.max()+0.5],
-  title=TITLE_DICT
+  title=TITLE_DICT,
+  shapes=pshapes 
 )
 for scatter in fig.data:
   legendgroup = scatter['legendgroup']
@@ -273,5 +335,4 @@ for scatter in fig.data:
 if not __ANIM_MODE__: 
   plotly.offline.plot(fig,filename="sol2.html",include_plotlyjs="cdn")
 else:
-  os.makedirs("anim",exist_ok=True)
-  fig.write_image(f"anim/{datafile.split('/')[-1].split('.')[0]}.png")
+  fig.write_image(f"anim/{datafile.split('/')[-1].split('.')[0]}.png",scale=2)

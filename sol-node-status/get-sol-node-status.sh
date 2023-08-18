@@ -16,7 +16,7 @@ readonly snapshot_density_proc="${snapshot_dir}/.snapshot_modulo.do.not.delete"
 # %N: NodeList, %C: Cores (A/I/O/T), %P: Partition, %T: State Extended
 # %O: CPU Load, %c: Cores on Node, %f: features, %E: Reason
 readonly sinfo_short_fmt="%N %C %P %T %O %c %f '%E'"
-# long format necessary since some fields are not available in the short fmt.
+# long format necessary since some fields are not availabe in the short fmt.
 #   N.B.: GresUsed req. fmt. :: undoc. limit of 21 char. 
 readonly sinfo_long_fmt='FreeMem,AllocMem,Memory,GresUsed:300,Gres:300,Timestamp'
 
@@ -25,15 +25,13 @@ readonly sinfo_long_fmt='FreeMem,AllocMem,Memory,GresUsed:300,Gres:300,Timestamp
 
 ./bin/local-sq-stats > "$snapshot_job_stats_dat"
 
-paste \
+paste                                   \
   <(sinfo --Node -o "$sinfo_short_fmt" | sed -e s/\"/\\\\\"/g -e s/\'/\"/g ) \
   <(sinfo --Node -O "$sinfo_long_fmt" ) \
   > "$snapshot_dat"
 ./plot-sol-node-status.py "$snapshot_dat" "$snapshot_job_stats_dat"
 
 # Inject refresh attribute into output plotly html
-# + update background color
-# + center plot
 awk '
   { 
     if ( NR == 2 ) { 

@@ -1,21 +1,21 @@
 Sol Node Status
 ===============
 
-Command-line
-------------
+Scrapes SLURM via `sinfo` and plots node status with `plotly`.
 
-<div float="center">
- <p align="center"> 
-  <img 
-    width="95%" 
-    src="assets/ns.png" 
-    alt="Command-line utility, ns, for displaying node status" 
-  >
- </p>
-</div>
+On Sol's `admin.sol.rc.asu.edu`, the user `software` runs the generating shell
+and python scripts via `crontab`:
 
-Python script created by Prof. Jay Oswald that converts SLURM node
-states into a convenient table summary in arbitrary-width terminals.
+    * * * * * /packages/public/sol-node-status/get-sol-node-status.sh &> /packages/public/sol-node-status/crontab.diag
+
+Current version is available from [rcstatus][rcstatus].
+
+Shell script will only save every tenth `zstd -19` compressed comma-separated
+value (csv) files (every ten minutes). This is determined by an incremented
+counter that is stored in `snapshot/.snapshot_modulo.do.not.delete`. When there
+are errors, the `zstd` file will not be generated and `csv`s will not be
+removed. This is to help determine what occurred in the data and catch all edge
+cases.
 
 Open OnDemand
 -------------
@@ -69,8 +69,6 @@ diagnostic statistics on the plotly figure, i.e.,
 Planned
 -------
 
-* Handle MIG slices for GPUs
-* Make available from OOD cluster status page.
 * Implement via JS in kibana.
 * Automate monthly archiving of snapshot data.
 
@@ -79,7 +77,8 @@ Changes
 
  Version | Date       | Notes
 :-------:|:----------:|:-------------------------------------------------------
- CURRENT | 2023-02-05 | version 0.7
+ CURRENT | 2023-05-01 | version 0.8
+   0.8   | 2023-05-01 | MIG support 
    0.7   | 2023-02-03 | NHC support (escaping quotes in node status REASON)
    0.6   | 2023-01-15 | GRES socket info bug, due to new `sinfo` reporting
    0.5   | 2023-01-06 | GRES length bug fix (`sinfo` fields require spec. width)
@@ -92,4 +91,4 @@ Changes
 
 
 
-[sol-status]: https://links.asu.edu/sol-status
+[rcstatus]: https://rcstatus.asu.edu/jyalim/sol.html
