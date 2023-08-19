@@ -47,6 +47,14 @@ are errors, the `zstd` file will not be generated and `csv`s will not be
 removed. This is to help determine what occurred in the data and catch all edge
 cases.
 
+The final html page is made available to the OOD nodes through Salt
+symbolically linking the html file:
+
+    admin:/srv/salt/sol/states/cluster/ood/apps/status/status.sls
+        /packages/public/sol-node-status/sol.html ->
+        ood*:/var/www/ood/public
+
+
 Debugging
 ---------
 
