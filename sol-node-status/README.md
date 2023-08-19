@@ -1,21 +1,22 @@
 Sol Node Status
 ===============
 
+Command-line
+------------
+
+<div float="center">
+ <p align="center"> 
+  <img 
+    width="95%" 
+    src="assets/ns.png" 
+    alt="Command-line utility, ns, for displaying node status" 
+  >
+ </p>
+</div>
+
+Python script created by Prof. Jay Oswald that converts SLURM node
+states into a convenient table summary in arbitrary-width terminals.
 Scrapes SLURM via `sinfo` and plots node status with `plotly`.
-
-On Sol's `admin.sol.rc.asu.edu`, the user `software` runs the generating shell
-and python scripts via `crontab`:
-
-    * * * * * /packages/public/sol-node-status/get-sol-node-status.sh &> /packages/public/sol-node-status/crontab.diag
-
-Current version is available from [rcstatus][rcstatus].
-
-Shell script will only save every tenth `zstd -19` compressed comma-separated
-value (csv) files (every ten minutes). This is determined by an incremented
-counter that is stored in `snapshot/.snapshot_modulo.do.not.delete`. When there
-are errors, the `zstd` file will not be generated and `csv`s will not be
-removed. This is to help determine what occurred in the data and catch all edge
-cases.
 
 Open OnDemand
 -------------
