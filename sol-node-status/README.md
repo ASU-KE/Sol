@@ -92,4 +92,4 @@ Changes
 
 
 
-[rcstatus]: https://rcstatus.asu.edu/jyalim/sol.html
+[sol-status]: https://links.asu.edu/sol-status
