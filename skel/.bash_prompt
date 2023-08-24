@@ -1,0 +1,32 @@
+# .bash_prompt
+# BLAME: William Dizon <wdizon@asu.edu>
+####
+
+# STANDARD USER PROMPT
+# Change \w to \W to have ~/a/b/c change to c
+PS1="[\u@\h:\[\033[1;32m\]\w\[\033[0m\]]\\$ "
+
+## CUSTOMIZED USER PROMPT:
+## Keep double commented lines, remove single-commented lines to use
+## [4s:0] [user@c001:~]$
+## [^ Execution time of last command
+##     ^ Exit code of last command
+##         ^ ASURITE
+##              ^ Current node
+##                   ^ Current directory
+#
+#function timer_start {
+#  timer=${timer:-$SECONDS}
+#}
+#
+#function timer_stop {
+#  timer_show=$(($SECONDS - $timer))
+#  unset timer
+#}
+#
+#trap 'timer_start' DEBUG
+#PROMPT_COMMAND="${PROMPT_COMMAND} timer_stop"
+#
+#PS1='[${timer_show}s:$?] [\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]]\[\033[00m\]\$ '
+
+## End Customized bash prompt

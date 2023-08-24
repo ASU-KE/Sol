@@ -1,0 +1,56 @@
+# ======================================================================
+# READLINE CONFIGURATION FILE
+# ======================================================================
+# Operator definitions
+# ----------------------------------------------------------------------
+# \C- = Control 
+# \M- = Meta 
+# \e  = Escape/Option/Alternate
+# ======================================================================
+# BLAME: Jason <yalim@asu.edu> 
+# ======================================================================
+
+# ======================================================================
+# SHELL SEARCH MODERNIZATION
+# Changes default history maneuvering with arrow keys.
+# ----------------------------------------------------------------------
+#   [A  up
+#   [B  down
+#   [5~ page up
+#   [6~ page down
+"\e[A":  history-search-backward
+"\e[B":  history-search-forward
+"\C-p":  history-search-backward
+"\C-n":  history-search-forward
+"\e[5~": previous-history
+"\e[6~": next-history
+"\C-x\C-l": complete
+"\C-x\C-n": menu-complete
+"\C-x\C-p": menu-complete-backward
+# ======================================================================
+## Suggested for those with Macs that have option send Esc:
+# "\e\C-w": backward-kill-word
+# "\e\C-k": kill-region
+# ======================================================================
+## My Favorites:
+# These can all be listed with $ bind -p
+# \C-x\C-e: edit-and-execute-command
+# \e\C-e:   shell-expand-line
+#   \e-d:   kill-word
+#   \e-t:   shell-transpose-words
+#   \C-h:   backward-delete-char
+# \e\C-h:   backward-kill-word
+# \e\C-w:   backward-kill-word
+# \C-x!:    possible-command-completions
+# \C-x/:    possible-filename-completions
+# \C-x@:    possible-hostname-completions
+# \C-x~:    possible-username-completions
+# \C-x$:    possible-variable-completions
+# \C-x\C-r: re-read-init-file
+# \C-x\C-u: undo (also \C-_)
+# \C-x\C-x: exchange-point-and-mark (point is where the cursor is)
+# \C-@:     set-mark
+# \M-<space>: set-mark
+# \C-]:     character-search
+# \M-\C-]:  character-search-backward
+# ======================================================================
