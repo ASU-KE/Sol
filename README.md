@@ -12,7 +12,7 @@ The Sol supercomputer at Arizona State University
 </div>
 
 The following repository contains supplementary material for a PEARC
-2023 short paper that is currently under review.  
+2023 short paper that is in-press.
 
 <div float="center">
  <p align="center">
