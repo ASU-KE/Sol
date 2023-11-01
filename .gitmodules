@@ -4,3 +4,6 @@
 [submodule "sol-various-scripts"]
 	path = sol-various-scripts
 	url = https://github.com/jyalim/sol-various-scripts
+[submodule "sol-tutorials"]
+	path = sol-tutorials
+	url = https://github.com/jyalim/sol-tutorials
