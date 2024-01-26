@@ -8,5 +8,5 @@
 	path = sol-tutorials
 	url = https://github.com/jyalim/sol-tutorials
 [submodule "sol-operations/HUST23-SC23-LLMs"]
-	path = sol-operations/HUST23-SC23-LLMs
+	path = sol-additional-operations/HUST23-SC23-LLMs
 	url = https://github.com/jackfrost1411/HUST23-SC23-LLMs
