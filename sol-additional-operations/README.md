@@ -5,7 +5,7 @@ Additional operational materials related to Sol
  <p align="center">
   <img 
     width="50%"
-    src="assets/sol-logo.png" 
+    src="../assets/sol-logo.png" 
     alt="Sol supercomputer logo" 
   >
  </p>
