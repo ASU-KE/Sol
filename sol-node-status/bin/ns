@@ -156,10 +156,10 @@ def parse_next_node(node_iter,no_gpus=False):
   m4= None
   for line in node_iter:
     m1 = re.search('State=(.*.) Threads', line)
-    m2 = re.search('CPUAlloc=(\d+) CPUEfctv=\d+ CPUTot=(\d+)', line)
+    m2 = re.search(r'CPUAlloc=(\d+) CPUEfctv=\d+ CPUTot=(\d+)', line)
     if no_gpus == False:
-      m3 = re.search('Gres=gpu:(.*.):(\d+)', line)
-      m4 = re.search('GresUsed=gpu:(.*.):(\d+)\(IDX:(.*.)\)', line)
+      m3 = re.search(r'Gres=gpu:(.*.):(\d+)', line)
+      m4 = re.search(r'GresUsed=gpu:(.*.):(\d+)\(IDX:(.*.)\)', line)
     if not line:
       break
     elif m1:
