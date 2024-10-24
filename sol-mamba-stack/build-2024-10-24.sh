@@ -1,7 +1,7 @@
-admin="tianche5"
-version="1.5.8"
-url='https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh'
-script="Miniconda3-latest-Linux-x86_64-2024-07-08.sh"
+admin="jyalim"
+version="1.5.9"
+url="https://github.com/conda-forge/miniforge/releases/download/24.9.0-0/Mambaforge-24.9.0-0-Linux-x86_64.sh"
+script="$(basename $url)"
 bwd="/packages/apps/mamba/${version}"
 
 wget -O "$script" "$url"
@@ -11,10 +11,6 @@ bash "$script" -sbp "$bwd"
 bash create-modulefile.sh $admin $version
 
 module load mamba/.${version}
-
-conda install -yc conda-forge mamba=$version
-
-# mamba update conda -yc conda-forge
 
 packages=(
   ## base scientific libraries
@@ -55,11 +51,6 @@ packages=(
   dask
   ## install pure C++ implementation for those that want it
   micromamba
-  ###
-  # mamba/conda install openssl versions that will conflict 
-  # with base system openssl, so install openssh + rsync
-  openssh
-  rsync
 )
 
 mamba install -yc conda-forge "${packages[@]}"

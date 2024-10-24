@@ -44,30 +44,16 @@ Any other use is NOT TESTED.
 set topdir /packages/apps/mamba/${version}
 
 prepend-path     PATH               \$topdir/bin
-prepend-path     LD_LIBRARY_PATH    \$topdir/lib
 prepend-path     INCLUDE            \$topdir/include
 prepend-path     MANPATH            \$topdir/man
 prepend-path     MANPATH            \$topdir/share/man
 prepend-path     INFOPATH           \$topdir/share/info
 prepend-path     CONDA_ENVS_PATH    /packages/envs
+## This conflicts with system libraries and is not needed for a working 
+## base nor for building environments.
+#prepend-path     LD_LIBRARY_PATH    \$topdir/lib
 
 if { [module-info mode display] } {
-    # RC FIELDS
-    setenv RC_8X "1"
-    setenv RC_PKG_MANAGER "1"
-    setenv RC_OOD     "0"
-    setenv RC_NOLOGIN "0"
-    setenv RC_DEPRECATED "0"
-    setenv RC_EXPERIMENTAL "0"
-    setenv RC_DISCOURAGED "0"
-    setenv RC_RETIRED "0"
-    setenv RC_VIRTUAL "0"
-
-    setenv RC_TAGS "PYTHON,PKGMAN"
-    setenv RC_DESCRIPTION "mamba for building user/system python environments"
-    setenv RC_URL ""
-    setenv RC_NOTES ""
-
     setenv RC_INSTALL_DATE "$date"
     setenv RC_INSTALLER "$who_built"
     setenv RC_BUILDPATH "/packages/apps/mamba/build"
